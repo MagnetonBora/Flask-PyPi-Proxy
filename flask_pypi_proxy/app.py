@@ -8,8 +8,9 @@ import json
 import logging
 from flask import Flask
 
+
 def read_configuration(app, pypi_url='http://pypi.python.org',
-                       private_eggs=[]):
+                       private_eggs=None):
     ''' Reads the configuration by using the system file or the configuration
     file.
 
@@ -20,6 +21,7 @@ def read_configuration(app, pypi_url='http://pypi.python.org',
     :param str private_eggs: the list of the name of the projects for which
                              the **pypi_url** won't be used.
     '''
+    private_eggs_list = private_eggs if private_eggs is not None else []
     filepath = os.environ.get('FLASK_PYPI_PROXY_CONFIG')
     if filepath:
         # then the configuration file is used
@@ -38,7 +40,7 @@ def read_configuration(app, pypi_url='http://pypi.python.org',
                                 'LOGGING_PATH')
 
             app.config['PRIVATE_EGGS'] = configuration.get('PRIVATE_EGGS',
-                                                           private_eggs)
+                                                           private_eggs_list)
             app.config['BASE_FOLDER_PATH'] = configuration['BASE_FOLDER_PATH']
             app.config['SHOULD_USE_EXISTING'] = configuration.get(
                                                         'SHOULD_USE_EXISTING',
@@ -69,10 +71,10 @@ def read_configuration(app, pypi_url='http://pypi.python.org',
         if env_value:
             app.config['PRIVATE_EGGS'] = env_value.split(',')
         else:
-            app.config['PRIVATE_EGGS'] = private_eggs
+            app.config['PRIVATE_EGGS'] = private_eggs_list
 
         app.config['PYPI_URL'] = os.environ.get('PYPI_PROXY_PYPI_URL',
-                                                pypi_url)
+pypi_url)
         app.config['SHOULD_USE_EXISTING'] = os.environ.get(
                                             'PYPI_PROXY_SHOULD_USE_EXISTING',
                                             False)
